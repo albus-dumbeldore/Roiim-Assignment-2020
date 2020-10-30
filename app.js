@@ -13,7 +13,7 @@ mongoose.connect('mongodb://localhost/roiim',{useNewUrlParser:true,useUnifiedTop
 
 app.set('view engine','hbs')
 app.set("view engine","ejs");
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({extended:true}))
 
 
 // ============================models============================================================
