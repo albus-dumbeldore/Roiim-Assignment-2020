@@ -42,7 +42,8 @@ app.post('/roiim/customerid',(req,res)=>{
     data=JSON.parse(data)
     var email=data.email
 
-    ConsumerId.findOne({email:email},(err,result)=>{
+        var result = false;
+    // ConsumerId.findOne({email:email},(err,result)=>{
         if(result){
             console.log('bc')
             res.send(JSON.stringify(result))
@@ -100,7 +101,7 @@ app.post('/roiim/customerid',(req,res)=>{
             // res.send('f89e36d8-09cd-4189-b43a-c80dc07ad3a0')
         } 
         
-    })
+    // })
 })
 
 app.post('/roiim/customerToken',(req,res)=>{
