@@ -40,11 +40,11 @@ app.post('/roiim/customerid',(req,res)=>{
 
     ConsumerId.findOne({email:email}).then(result=>{
         if(result){
-            // console.log('bc bhag na')
+            console.log('bc bhag na')
             res.send(JSON.stringify(result))
         }
         else{
-            // console.log('teri ma ki chut')
+            console.log('teri ma ki chut')
             request({
                 url: 'https://api.test.paysafe.com/paymenthub/v1/customers', 
                 method :"POST",
@@ -72,9 +72,9 @@ app.post('/roiim/customerid',(req,res)=>{
                 },
                 json:true
                 }, function (error, response, body) {
-                // console.log('Status:', response.statusCode);
+                console.log('Status:', response.statusCode);
                 // console.log(error,body)
-                // console.log(response.body.id)
+                console.log(response.body.id)
                 // console.log(body.error)
                 // if(body.error){
                 //     res.end("error"); 
@@ -103,7 +103,7 @@ app.post('/roiim/customerid',(req,res)=>{
 app.post('/roiim/customerToken',(req,res)=>{
     var data=JSON.stringify(req.body)
     data=JSON.parse(data)
-    // console.log(data)
+    console.log(data)
 
     request({
         url: 'https://api.test.paysafe.com/paymenthub/v1/customers/'+data.customerid+'/singleusecustomertokens', 
@@ -154,7 +154,7 @@ app.post('/roiim/payment',(req,res)=>{
         },
         json:true
         }, function (error, response, body) {
-        // console.log('Status:', response.statusCode);
+        console.log('Status:', response.statusCode);
         // console.log(error,body)
         // console.log(response)
         // console.log(body.error)

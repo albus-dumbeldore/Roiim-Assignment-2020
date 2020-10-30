@@ -23,33 +23,7 @@
 
             // For customer id
             
-            await $.ajax({
-			    type: 'POST',
-                data: data,
-                dataType: "json",
-                url: '/roiim/customerid',						
-                success: function(data1) {
-                    //console.log('ara')
-                    //console.log(data1)
-                    data.customerid=data1.id
-                }
-            });
-
-            // for Single use customer token
-
-            await $.ajax({
-                type: 'POST',
-                data : data,
-                dataType: "json",
-                url: '/roiim/customerToken',						
-                success: function(data) {
-                    //console.log('ara1')
-                    //console.log(data.body.singleUseCustomerToken)
-                    singleUseCustomerToken=data.body.singleUseCustomerToken
-                    //console.log('loda'+singleUseCustomerToken)
-                }
-                        
-            });
+            
 
             //console.log('bc' + singleUseCustomerToken)
 
@@ -60,7 +34,6 @@
                 "currency": "USD",
                 "amount": parseInt(amount)*100,
                 "locale": "en_US",
-                "singleUseCustomerToken":singleUseCustomerToken,
                 "customer": {
                     "firstName": firstName,
                     "lastName": lastName,
