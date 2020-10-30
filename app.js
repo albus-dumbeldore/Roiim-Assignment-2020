@@ -25,7 +25,7 @@ var consumerIdSchema = new mongoose.Schema({
 var  ConsumerId= mongoose.model('ConsumerId',consumerIdSchema)
 // =================================================================================================
 
-app.get('/roiim',(req,res)=>{
+app.get('/',(req,res)=>{
     res.render("Payment.ejs")
 })
 
