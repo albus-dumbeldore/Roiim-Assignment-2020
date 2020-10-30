@@ -40,10 +40,11 @@ app.post('/roiim/customerid',(req,res)=>{
 
     ConsumerId.findOne({email:email}).then(result=>{
         if(result){
-            // console.log('bc bhag na')
+            console.log('bc bhag na')
             res.send(JSON.stringify(result))
         }
         else{
+            console.log('teri ma ki chut')
             request({
                 url: 'https://api.test.paysafe.com/paymenthub/v1/customers', 
                 method :"POST",
