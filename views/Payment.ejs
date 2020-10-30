@@ -27,7 +27,7 @@
 			    type: 'POST',
                 data: data,
                 dataType: "json",
-                url: 'https://frozen-lowlands-11187.herokuapp.com/roiim/customerid',						
+                url: '/roiim/customerid',						
                 success: function(data1) {
                     //console.log('ara')
                     //console.log(data1)
@@ -41,7 +41,7 @@
                 type: 'POST',
                 data : data,
                 dataType: "json",
-                url: 'https://frozen-lowlands-11187.herokuapp.com/roiim/customerToken',						
+                url: '/roiim/customerToken',						
                 success: function(data) {
                     //console.log('ara1')
                     //console.log(data.body.singleUseCustomerToken)
@@ -125,7 +125,7 @@
 						type: 'POST',
                         dataType : "json",
                         data : data,
-                        url: 'https://frozen-lowlands-11187.herokuapp.com/roiim/payment',						
+                        url: '/roiim/payment',						
                         success: function(data) {
                             console.log('agya')
                             instance.showSuccessScreen()
