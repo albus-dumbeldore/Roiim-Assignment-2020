@@ -1,89 +1,6 @@
-<!-- <%- include("./partials/header.ejs") %>
-<%- include("./Paymentform.ejs") %> -->
+<%- include("./partials/header.ejs") %>
+<%- include("./Paymentform.ejs") %>
     
-<html lang="en">
-    
-    <head>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
-        crossorigin="anonymous">
-        <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
-        <script src="https://hosted.paysafe.com/checkout/v2/paysafe.checkout.min.js"></script>
-        <script src="https://code.jquery.com/jquery-1.6.2.min.js"></script>		
-
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Payment Form</title>
-        
-    </head>
-    <body>  
-
-        <div class="container mt-5">
-          <div class="row">
-            <div class="col"></div>
-            <div class="col-sm-7 col-md-6 col-lg-5 ">
-              <div class="card shadow border-0">
-                <div class="card-body">
-                  <h1 class="text-center">Paysafe Checkout</h1>
-                  <p>
-                    <small class="text-muted">Fields marked * are required.</small>
-                  </p>
-                  <form>
-                    <div class="form-group" autocomplete="off">
-                      <label for="">First Name*</label>
-                      <input type="text" name="firstName" class="form-control" id="first_name" placeholder="John" autocomplete="off"  required>
-                      <div class="invalid-feedback">
-                        Please enter your first name.
-                      </div>
-                    </div>
-      
-                    <div class="form-group">
-                      <label for="">Last Name*</label>
-                      <input type="text" name="lastName" class="form-control" id="last_name" placeholder="Smith" autocomplete="off" required>
-                      <div class="invalid-feedback">
-                        Please enter your last name.
-                      </div>
-                    </div>
-                    
-                    <div class="form-group">
-                      <label for="">Email*</label>
-                      <input type="email" name="email" class="form-control" id="email" placeholder="john@smith.com" autocomplete="off" required>
-                      <div class="invalid-feedback">
-                        Please provide an email.
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="">Phone*</label>
-                      <input type="number" name="phone" class="form-control" id="phone" placeholder="123-456-6789"autocomplete="off" required >
-                    </div>
-                    
-                   
-                    <div class="form-group">
-                      <label for="">Amount*</label>
-                      <input type="text"  class="form-control" id="amount" autocomplete="off" required>
-                      <div class="invalid-feedback">
-                        Please enter amount .
-                      </div>
-                    </div>
-                    
-                    <button name="submit" type="button" class="btn btn-danger btn-block" onclick="checkout()">Paid</button>
-                  </form>
-                  
-                </div>
-              </div>
-            </div>
-            <div class="col"> </div>
-          </div>
-        </div>
-      
-      
-      
-      </body>
-      
-      
-      
-
     <script>
         async function checkout() {
             var firstName           = document.getElementById("first_name").value
@@ -110,7 +27,7 @@
 			    type: 'POST',
                 data: data,
                 dataType: "json",
-                url: '/roiim/customeridloda',						
+                url: '/roiim/customerid',						
                 success: function(data1) {
                     //console.log('ara')
                     //console.log(data1)
@@ -232,5 +149,5 @@
         }
     
     </script>
-</html>
-<!-- <%- include("./partials/footer.ejs") %> -->
+
+<%- include("./partials/footer.ejs") %>

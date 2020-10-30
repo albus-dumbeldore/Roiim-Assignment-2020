@@ -30,7 +30,7 @@ app.get('/',(req,res)=>{
 })
 
 
-app.post('/roiim/customeridloda',(req,res)=>{
+app.post('/roiim/customerid',(req,res)=>{
     // res.send('Success')
     // console.log(req)
     var data=JSON.stringify(req.body)
