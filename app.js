@@ -42,9 +42,9 @@ app.post('/roiim/customerid',(req,res)=>{
     data=JSON.parse(data)
     var email=data.email
 
-        var result = false;
+        var result1 = false;
     ConsumerId.find({email:email},(err,result)=>{
-        if(result){
+        if(result1){
             console.log('bc')
             res.send(JSON.stringify(result))
         }
