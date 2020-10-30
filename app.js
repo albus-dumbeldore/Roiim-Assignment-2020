@@ -38,13 +38,12 @@ app.post('/roiim/customerid',(req,res)=>{
     var email=data.email
     // console.log(typeof email)
 
-    ConsumerId.findOne({email:email}).then(result=>{
+    ConsumerId.findOne({email:email},(err,result)=>{
         if(result){
-            console.log('bc bhag na')
+            console.log('bc')
             res.send(JSON.stringify(result))
         }
         else{
-            console.log('teri ma ki chut')
             request({
                 url: 'https://api.test.paysafe.com/paymenthub/v1/customers', 
                 method :"POST",
@@ -92,11 +91,9 @@ app.post('/roiim/customerid',(req,res)=>{
                 })
 
                 // res.end(response.body.id)
-            }); 
-
-        }
-    }).catch(err=>{
-        res.send(error)
+            });
+        } 
+        
     })
 })
 
