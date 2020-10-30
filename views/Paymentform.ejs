@@ -1,0 +1,67 @@
+<%- include("./partials/header.ejs") %>
+
+<body>  
+
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col"></div>
+      <div class="col-sm-7 col-md-6 col-lg-5 ">
+        <div class="card shadow border-0">
+          <div class="card-body">
+            <h1 class="text-center">Paysafe Checkout</h1>
+            <p>
+              <small class="text-muted">Fields marked * are required.</small>
+            </p>
+            <form>
+              <div class="form-group" autocomplete="off">
+                <label for="">First Name*</label>
+                <input type="text" name="firstName" class="form-control" id="first_name" placeholder="John" autocomplete="off"  required>
+                <div class="invalid-feedback">
+                  Please enter your first name.
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="">Last Name*</label>
+                <input type="text" name="lastName" class="form-control" id="last_name" placeholder="Smith" autocomplete="off" required>
+                <div class="invalid-feedback">
+                  Please enter your last name.
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="">Email*</label>
+                <input type="email" name="email" class="form-control" id="email" placeholder="john@smith.com" autocomplete="off" required>
+                <div class="invalid-feedback">
+                  Please provide an email.
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="">Phone*</label>
+                <input type="number" name="phone" class="form-control" id="phone" placeholder="123-456-6789"autocomplete="off" required >
+              </div>
+              
+             
+              <div class="form-group">
+                <label for="">Amount*</label>
+                <input type="text"  class="form-control" id="amount" autocomplete="off" required>
+                <div class="invalid-feedback">
+                  Please enter amount .
+                </div>
+              </div>
+              
+              <button name="submit" type="button" class="btn btn-danger btn-block" onclick="checkout()">Paid</button>
+            </form>
+            
+          </div>
+        </div>
+      </div>
+      <div class="col"> </div>
+    </div>
+  </div>
+
+
+
+</body>
+
+
