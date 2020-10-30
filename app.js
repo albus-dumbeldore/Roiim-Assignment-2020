@@ -96,7 +96,7 @@ app.post('/roiim/customerid',(req,res)=>{
 
         }
     }).catch(err=>{
-        res.send("error")
+        res.send(error)
     })
 })
 
