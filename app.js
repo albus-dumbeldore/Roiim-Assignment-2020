@@ -11,7 +11,7 @@ const mongoose      = require('mongoose')
 var http            = require('http')
 var server          = http.createServer(app)
 var port            = process.env.PORT || 3000
-var ConsumerId      = require('./models/consumerid.js')
+var CustomerID      = require('./models/consumerid.js')
 
 const dburl         = process.env.DB_URL || 'mongodb://localhost/roiim-assignment'
 
@@ -23,6 +23,8 @@ mongoose.connect(dburl,{
     useCreateIndex:true,
     useFindAndModify:false
 })
+
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -38,68 +40,20 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 
 app.get('/',(req,res)=>{
-    
     res.render("Payment.ejs")
 })
 
 
-app.post('/roiim/customerid',(req,res)=>{
+app.post('/roiim/customerid',async(req,res)=>{
     
     var data=JSON.stringify(req.body)
     data=JSON.parse(data)
-    var email=data.email
-    console.log(data)
-
-    ConsumerId.findOne({email:email},(err,result)=>{
-        if(result){
-            console.log('bc')
-            res.send(JSON.stringify(result))
-        }
-        else{
-            request({
-                url: 'https://api.test.paysafe.com/paymenthub/v1/customers', 
-                method :"POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
-                    'Simulator': 'EXTERNAL'
-                },
-                body: {
-                    "merchantCustomerId": email,
-                    "locale": "en_US",
-                    "firstName": data.firstName,
-                    "lastName": data.lastName,
-                    "dateOfBirth": {
-                        "year": 1990,
-                        "month": 7,
-                        "day": 1
-                    },
-                    "email": email,
-                    "phone": data.phone,
-                    "ip": "192.0.126.111",
-                    "gender": "M",
-                    "nationality": "Canadian",
-                    "cellPhone": "777-555-8888"
-                },
-                json:true
-                }, function (error, response, body) {
-                console.log('Status:', response.statusCode);
-                
-                var newConsumerId = new ConsumerId({
-                    email:email,
-                    id:response.body.id
-                })
-                newConsumerId.save((err,user)=>{
-                    if(err)console.log(err)
-                    else{
-                        res.send(JSON.stringify(user))
-                    } 
-                })
-            });
-        } 
-        
-    })
+    
+    var CustomerIdOrError = await GenerateCustomerId(data)
+    res.send(CustomerIdOrError)
 })
+
+
 
 app.post('/roiim/customerToken',async(req,res)=>{
     var data=JSON.stringify(req.body)
@@ -112,46 +66,66 @@ app.post('/roiim/customerToken',async(req,res)=>{
 
 })
 
-
-var GenerateCustomerToken = function (data){
-    return new Promise((resolve,reject)=>{
-        request({
-            url: 'https://api.test.paysafe.com/paymenthub/v1/customers/'+data.customerid+'/singleusecustomertokens', 
-            method :"POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
-                'Simulator': 'EXTERNAL'
-            },
-            body: {
-                "merchantRefNum": data.merchantRefNumber,
-                "paymentTypes": ["CARD"]
-            },
-            json:true
-            },function (error, response, body) {
-    
-            console.log('customer Status:', response.statusCode);
-            
-            console.log(response.body.singleUseCustomerToken)
-            
-            if(response.statusCode>=200 & response.statusCode<300){
-                resolve(JSON.stringify(response))
-            }
-            else{
-                reject ('error')
-            }
-        }); 
-
-    })
-}
-
-
 app.post('/roiim/payment',(req,res)=>{
     var data=JSON.stringify(req.body)
     data=JSON.parse(data)
 
     res.send (intiatePayment(data))
 })
+
+
+function GenerateCustomerId(data){
+    return new Promise((resolve,reject)=>{
+        var email=data.email
+        CustomerID.findOne({email:email},(err,result)=>{
+            if(result){
+                resolve(JSON.stringify(result))
+            }
+            else{
+                request({
+                    url: 'https://api.test.paysafe.com/paymenthub/v1/customers', 
+                    method :"POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
+                        'Simulator': 'EXTERNAL'
+                    },
+                    body: {
+                        "merchantCustomerId": email,
+                        "locale": "en_US",
+                        "firstName": data.firstName,
+                        "lastName": data.lastName,
+                        "dateOfBirth": {
+                            "year": 1990,
+                            "month": 7,
+                            "day": 1
+                        },
+                        "email": email,
+                        "phone": data.phone,
+                        "ip": "192.0.126.111",
+                        "gender": "M",
+                        "nationality": "Canadian",
+                        "cellPhone": "777-555-8888"
+                    },
+                    json:true
+                    }, function (error, response, body) {
+                    console.log('Status:', response.statusCode);
+                    
+                    var newCustomerID = new CustomerID({
+                        email:email,
+                        id:response.body.id
+                    })
+                    newCustomerID.save((err,user)=>{
+                        if(err)reject(err)
+                        else{
+                            resolve(JSON.stringify(user))
+                        } 
+                    })
+                });
+            } 
+        })
+    })
+}
 
 
 function intiatePayment(data){
@@ -185,6 +159,38 @@ function intiatePayment(data){
         }
     }); 
     
+}
+
+function GenerateCustomerToken(data){
+    return new Promise((resolve,reject)=>{
+        request({
+            url: 'https://api.test.paysafe.com/paymenthub/v1/customers/'+data.customerid+'/singleusecustomertokens', 
+            method :"POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
+                'Simulator': 'EXTERNAL'
+            },
+            body: {
+                "merchantRefNum": data.merchantRefNumber,
+                "paymentTypes": ["CARD"]
+            },
+            json:true
+            },function (error, response, body) {
+    
+            console.log('customer Status:', response.statusCode);
+            
+            console.log(response.body.singleUseCustomerToken)
+            
+            if(response.statusCode>=200 & response.statusCode<300){
+                resolve(JSON.stringify(response))
+            }
+            else{
+                reject ('error')
+            }
+        }); 
+
+    })
 }
 
 server.listen(port,()=>{
