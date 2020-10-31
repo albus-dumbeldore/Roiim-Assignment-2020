@@ -1,3 +1,9 @@
+if(process.env.NODE_ENV !== "production"){
+    require('dotenv').config()
+
+    // require('dotenv').config({path: './.env'})
+}
+
 
 const express       = require('express')
 const hbs           = require('hbs')
@@ -9,8 +15,25 @@ var http            = require('http')
 var server          = http.createServer(app)
 var port            = process.env.PORT || 3000
 var ConsumerId      = require('./models/consumerid.js')
+const dburl         = process.env.DB_URL || 'mongodb://localhost/roiim-assignment'
 
-mongoose.connect('mongodb://localhost/roiim-assignment',{useNewUrlParser:true,useUnifiedTopology:true})
+
+// mongodb://localhost:3000/roiim-assignment
+
+mongoose.connect(dburl,{
+    useNewUrlParser:true,
+    useUnifiedTopology:true,
+    useCreateIndex:true,
+    useFindAndModify:false
+})
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  // we're connected!
+  console.log('connected')
+});
+
 
 app.set('view engine','hbs')
 app.set("view engine","ejs");
@@ -27,6 +50,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 // =================================================================================================
 
 app.get('/',(req,res)=>{
+    
     res.render("Payment.ejs")
 })
 
