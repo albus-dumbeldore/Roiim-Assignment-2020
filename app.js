@@ -3,20 +3,28 @@ if(process.env.NODE_ENV !== "production"){
 }
 
 
-const express       = require('express')
-const app           = express()
-var request         = require('request');
-const bodyParser    = require("body-parser")
-const mongoose      = require('mongoose')
-var http            = require('http')
-var server          = http.createServer(app)
-var port            = process.env.PORT || 3000
-var CustomerID      = require('./models/consumerid.js')
+const express           = require('express')
+const app               = express()
+var request             = require('request');
+const bodyParser        = require("body-parser")
+const mongoose          = require('mongoose')
+var http                = require('http')
+var server              = http.createServer(app)
+var port                = process.env.PORT || 3000
+var CustomerID          = require('./models/consumerid.js')
 
-const dburl         = process.env.DB_URL || 'mongodb://localhost/roiim-assignment'
+const dburl             = process.env.DB_URL || 'mongodb://localhost/roiim-assignment'
 
 
 
+// Require Routes so that we can use later
+var CustomerIdRoute     = require("./Routes/CustomerId.js")
+var SingleCustomerToken = require('./Routes/SingleCustomerToken.js')
+var PaymentDone         = require('./Routes/PaymentDone.js')
+
+
+
+// Connect database Locally or Live
 mongoose.connect(dburl,{
     useNewUrlParser:true,
     useUnifiedTopology:true,
@@ -33,166 +41,29 @@ db.once('open', function() {
 });
 
 
+
 app.set('view engine','hbs')
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended:true}))
 
 
 
+//PaymentForm  route 
 app.get('/',(req,res)=>{
     res.render("Payment.ejs")
 })
 
 
-app.post('/roiim/customerid',async(req,res)=>{
-    
-    var data=JSON.stringify(req.body)
-    data=JSON.parse(data)
-    
-    var CustomerIdOrError = await GenerateCustomerId(data)
-    res.send(CustomerIdOrError)
-})
+
+// Routes use
+app.use(CustomerIdRoute)
+app.use(SingleCustomerToken)
+app.use(PaymentDone)
 
 
 
-app.post('/roiim/customerToken',async(req,res)=>{
-    var data=JSON.stringify(req.body)
-    data=JSON.parse(data)
-    console.log(data)
 
-   var CustomerTokenOrError = await GenerateCustomerToken(data)
-
-   res.send(CustomerTokenOrError)
-
-})
-
-app.post('/roiim/payment',(req,res)=>{
-    var data=JSON.stringify(req.body)
-    data=JSON.parse(data)
-
-    res.send (intiatePayment(data))
-})
-
-
-function GenerateCustomerId(data){
-    return new Promise((resolve,reject)=>{
-        var email=data.email
-        CustomerID.findOne({email:email},(err,result)=>{
-            if(result){
-                resolve(JSON.stringify(result))
-            }
-            else{
-                request({
-                    url: 'https://api.test.paysafe.com/paymenthub/v1/customers', 
-                    method :"POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
-                        'Simulator': 'EXTERNAL'
-                    },
-                    body: {
-                        "merchantCustomerId": email,
-                        "locale": "en_US",
-                        "firstName": data.firstName,
-                        "lastName": data.lastName,
-                        "dateOfBirth": {
-                            "year": 1990,
-                            "month": 7,
-                            "day": 1
-                        },
-                        "email": email,
-                        "phone": data.phone,
-                        "ip": "192.0.126.111",
-                        "gender": "M",
-                        "nationality": "Canadian",
-                        "cellPhone": "777-555-8888"
-                    },
-                    json:true
-                    }, function (error, response, body) {
-                    console.log('Status:', response.statusCode);
-                    
-                    var newCustomerID = new CustomerID({
-                        email:email,
-                        id:response.body.id
-                    })
-                    newCustomerID.save((err,user)=>{
-                        if(err)reject(err)
-                        else{
-                            resolve(JSON.stringify(user))
-                        } 
-                    })
-                });
-            } 
-        })
-    })
-}
-
-
-function intiatePayment(data){
-
-    request({
-        url: 'https://api.test.paysafe.com/paymenthub/v1/payments', 
-        method :"POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
-            'Simulator': 'EXTERNAL'
-        },
-        body: {
-            "merchantRefNum": data.merchantNumber,
-            "amount": parseInt(data.amount)*100,
-            "currencyCode": "USD",
-            "dupCheck": true,
-            "settleWithAuth": false,
-            "paymentHandleToken": data.token,
-            "customerIp": "10.10.12.64",
-            "description": "Magazine subscription",
-        },
-        json:true
-        }, function (error, response, body) {
-        console.log('Status:', response.statusCode);
-        
-        if(response.statusCode>=200 & response.statusCode<300){
-            return 'success'
-        }else{
-            return 'error'
-        }
-    }); 
-    
-}
-
-function GenerateCustomerToken(data){
-    return new Promise((resolve,reject)=>{
-        request({
-            url: 'https://api.test.paysafe.com/paymenthub/v1/customers/'+data.customerid+'/singleusecustomertokens', 
-            method :"POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
-                'Simulator': 'EXTERNAL'
-            },
-            body: {
-                "merchantRefNum": data.merchantRefNumber,
-                "paymentTypes": ["CARD"]
-            },
-            json:true
-            },function (error, response, body) {
-    
-            console.log('customer Status:', response.statusCode);
-            
-            console.log(response.body.singleUseCustomerToken)
-            
-            if(response.statusCode>=200 & response.statusCode<300){
-                resolve(JSON.stringify(response))
-            }
-            else{
-                reject ('error')
-            }
-        }); 
-
-    })
-}
-
+// Server 
 server.listen(port,()=>{
     console.log('Server is on port ' + 3000)
 })

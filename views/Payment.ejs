@@ -29,8 +29,6 @@
                 dataType: "json",
                 url: '/roiim/customerid/',						
                 success: function(data1) {
-                    //console.log('ara')
-                    //console.log(data1)
                     data.customerid=data1.id
                 }
             });
@@ -43,17 +41,10 @@
                 dataType: "json",
                 url: '/roiim/customerToken',						
                 success: function(data) {
-                    console.log('ara1')
-                    //console.log(data.body.singleUseCustomerToken)
                     singleUseCustomerToken=data.body.singleUseCustomerToken
-                    //console.log('loda'+singleUseCustomerToken)
                 }
                         
             });
-
-            //console.log('bc' + singleUseCustomerToken)
-
-            // iframe
             
 
             var obj={
@@ -112,8 +103,6 @@
             paysafe.checkout.setup("cHVibGljLTc3NTE6Qi1xYTItMC01ZjAzMWNiZS0wLTMwMmQwMjE1MDA4OTBlZjI2MjI5NjU2M2FjY2QxY2I0YWFiNzkwMzIzZDJmZDU3MGQzMDIxNDUxMGJjZGFjZGFhNGYwM2Y1OTQ3N2VlZjEzZjJhZjVhZDEzZTMwNDQ=",obj , function(instance, error, result) {
                 
                 if (result && result.paymentHandleToken) {
-                    //console.log(result)
-                    //console.log(result.paymentHandleToken);
 
                     var data={
                         token:result.paymentHandleToken,
