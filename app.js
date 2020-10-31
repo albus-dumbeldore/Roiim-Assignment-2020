@@ -1,12 +1,9 @@
 if(process.env.NODE_ENV !== "production"){
     require('dotenv').config()
-
-    // require('dotenv').config({path: './.env'})
 }
 
 
 const express       = require('express')
-const hbs           = require('hbs')
 const app           = express()
 var request         = require('request');
 const bodyParser    = require("body-parser")
@@ -15,10 +12,10 @@ var http            = require('http')
 var server          = http.createServer(app)
 var port            = process.env.PORT || 3000
 var ConsumerId      = require('./models/consumerid.js')
+
 const dburl         = process.env.DB_URL || 'mongodb://localhost/roiim-assignment'
 
 
-// mongodb://localhost:3000/roiim-assignment
 
 mongoose.connect(dburl,{
     useNewUrlParser:true,
@@ -26,7 +23,6 @@ mongoose.connect(dburl,{
     useCreateIndex:true,
     useFindAndModify:false
 })
-
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -40,25 +36,14 @@ app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended:true}))
 
 
-// ============================models============================================================
-// var consumerIdSchema = new mongoose.Schema({
-//     email:String,
-//     id:String
-// })
 
-// var  ConsumerId= mongoose.model('ConsumerId',consumerIdSchema)
-// =================================================================================================
-
-app.get('/',(req,res)=>{
+app.get('/roiim',(req,res)=>{
     
     res.render("Payment.ejs")
 })
 
 
 app.post('/roiim/customerid',(req,res)=>{
-    
-    
-
     
     var data=JSON.stringify(req.body)
     data=JSON.parse(data)
@@ -99,12 +84,6 @@ app.post('/roiim/customerid',(req,res)=>{
                 json:true
                 }, function (error, response, body) {
                 console.log('Status:', response.statusCode);
-                // console.log(error,body)
-                console.log(response.body.id)
-                // console.log(body.error)
-                // if(body.error){
-                //     res.end("error"); 
-                // }
                 
                 var newConsumerId = new ConsumerId({
                     email:email,
@@ -116,48 +95,67 @@ app.post('/roiim/customerid',(req,res)=>{
                         res.send(JSON.stringify(user))
                     } 
                 })
-
-                // res.end(response.body.id)
             });
         } 
         
     })
 })
 
-app.post('/roiim/customerToken',(req,res)=>{
+app.post('/roiim/customerToken',async(req,res)=>{
     var data=JSON.stringify(req.body)
     data=JSON.parse(data)
     console.log(data)
 
-    request({
-        url: 'https://api.test.paysafe.com/paymenthub/v1/customers/'+data.customerid+'/singleusecustomertokens', 
-        method :"POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
-            'Simulator': 'EXTERNAL'
-        },
-        body: {
-            "merchantRefNum": data.merchantRefNumber,
-            "paymentTypes": ["CARD"]
-        },
-        json:true
-        }, function (error, response, body) {
-        console.log('customer Status:', response.statusCode);
-        if(body.error){
-            res.end("error"); 
-        }
-        // console.log('ara')
-        res.end(JSON.stringify(response))
-    }); 
+   var CustomerTokenOrError = await GenerateCustomerToken(data)
+
+   res.send(CustomerTokenOrError)
 
 })
+
+
+var GenerateCustomerToken = function (data){
+    return new Promise((resolve,reject)=>{
+        request({
+            url: 'https://api.test.paysafe.com/paymenthub/v1/customers/'+data.customerid+'/singleusecustomertokens', 
+            method :"POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic cHJpdmF0ZS03NzUxOkItcWEyLTAtNWYwMzFjZGQtMC0zMDJkMDIxNDQ5NmJlODQ3MzJhMDFmNjkwMjY4ZDNiOGViNzJlNWI4Y2NmOTRlMjIwMjE1MDA4NTkxMzExN2YyZTFhODUzMTUwNWVlOGNjZmM4ZTk4ZGYzY2YxNzQ4',
+                'Simulator': 'EXTERNAL'
+            },
+            body: {
+                "merchantRefNum": data.merchantRefNumber,
+                "paymentTypes": ["CARD"]
+            },
+            json:true
+            },function (error, response, body) {
+    
+            console.log('customer Status:', response.statusCode);
+            
+            console.log(response.body.singleUseCustomerToken)
+            
+            if(response.statusCode>=200 & response.statusCode<300){
+                resolve(JSON.stringify(response))
+            }
+            else{
+                reject ('error')
+            }
+        }); 
+
+    })
+}
+
 
 app.post('/roiim/payment',(req,res)=>{
     var data=JSON.stringify(req.body)
     data=JSON.parse(data)
-    // console.log('bcccccccccccccc')
-    // console.log(data)
+
+    res.send (intiatePayment(data))
+})
+
+
+function intiatePayment(data){
+
     request({
         url: 'https://api.test.paysafe.com/paymenthub/v1/payments', 
         method :"POST",
@@ -179,15 +177,15 @@ app.post('/roiim/payment',(req,res)=>{
         json:true
         }, function (error, response, body) {
         console.log('Status:', response.statusCode);
-        // console.log(error,body)
-        // console.log(response)
-        // console.log(body.error)
-        if(body.error){
-            res.end("error"); 
+        
+        if(response.statusCode>=200 & response.statusCode<300){
+            return 'success'
+        }else{
+            return 'error'
         }
-        res.end(JSON.stringify(response))
     }); 
-})
+    
+}
 
 server.listen(port,()=>{
     console.log('Server is on port ' + 3000)
