@@ -8,6 +8,7 @@ const mongoose      = require('mongoose')
 var http            = require('http')
 var server          = http.createServer(app)
 var port            = process.env.PORT || 3000
+var ConsumerId      = require('./models/consumerid.js')
 
 mongoose.connect('mongodb://localhost/roiim-assignment',{useNewUrlParser:true,useUnifiedTopology:true})
 
@@ -17,12 +18,12 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 
 // ============================models============================================================
-var consumerIdSchema = new mongoose.Schema({
-    email:String,
-    id:String
-})
+// var consumerIdSchema = new mongoose.Schema({
+//     email:String,
+//     id:String
+// })
 
-var  ConsumerId= mongoose.model('ConsumerId',consumerIdSchema)
+// var  ConsumerId= mongoose.model('ConsumerId',consumerIdSchema)
 // =================================================================================================
 
 app.get('/',(req,res)=>{
@@ -32,15 +33,13 @@ app.get('/',(req,res)=>{
 
 app.post('/roiim/customerid',(req,res)=>{
     
- 
-    console.log('hello !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1')
-    // res.send('f89e36d8-09cd-4189-b43a-c80dc07ad3a0')
     
 
     
     var data=JSON.stringify(req.body)
     data=JSON.parse(data)
     var email=data.email
+    console.log(data)
 
     ConsumerId.findOne({email:email},(err,result)=>{
         if(result){
