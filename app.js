@@ -44,6 +44,7 @@ app.post('/roiim/customerid',(req,res)=>{
 
         var result1 = false;
     ConsumerId.findOne({email},(err,result)=>{
+        if(err)res.send(err)
         if(result1){
             console.log('bc')
             res.send(JSON.stringify(result))
