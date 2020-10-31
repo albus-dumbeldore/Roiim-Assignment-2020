@@ -11,7 +11,7 @@ You can see your save card from the same email id you saved previously while mak
  - Frontend (Implemented using HTML)
  - Database (MongoDB)
 
-Testing card details -
+<h2>Testing card details - </h2>
  <br>Account number       - 4530 9100 0001 2345 </br>
  <br>Card holder name     - (random name) </br>
  <br>Valid                - (Future Date) </br>
