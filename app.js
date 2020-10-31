@@ -37,7 +37,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 
 
-app.get('/roiim',(req,res)=>{
+app.get('/',(req,res)=>{
     
     res.render("Payment.ejs")
 })
